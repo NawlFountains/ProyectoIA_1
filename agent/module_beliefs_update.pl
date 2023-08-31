@@ -31,13 +31,13 @@
 % Pueden realizar todos los cambios de implementación que consideren necesarios.
 % Esta implementación busca ser un marco para facilitar la resolución del proyecto.
 
-update_beliefs(Perc):-
 
-	% El agente olvida todo lo que recordaba
-	retractall(time(_)),
-	retractall(direction(_)),
-	retractall(at(_, _, _)),
-	retractall(node(_, _, _, _, _)),
+update_beliefs(Perc):- forall(Rel,Perc),update(Rel)
 
-	% y recuerda lo que percibió
-	forall(member(Rel, Perc), assert(Rel)).
+update(Perc):- Perc = time(_), retract(time(_)), assert(Perc).
+
+update(Perc):- Perc = direction(_), retract(direction(_)), assert(Perc).
+
+update(Perc):- Perc = at(IdNodo,TipoEntidad,IdEntidad), retract(IdNodo,_,_), assert(Perc).
+
+update(Perc):- Perc = node(Id, PosX, PosY, Costo, Conexiones), retract(node(Id, PosX, PosY, _, _)), assert(Perc).

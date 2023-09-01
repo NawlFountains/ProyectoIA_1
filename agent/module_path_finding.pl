@@ -115,10 +115,15 @@ buscar(Frontera, _, _M, Nodo):-
 
 buscar(Frontera, Visitados, Metas, MM):-
 	seleccionar(Nodo, Frontera, FronteraSinNodo), % selecciona primer nodo de la frontera
-	generarVecinos(Nodo, Vecinos), % genera los vecinos del nodo - TO-DO
+	generarVecinos(Nodo, Vecinos), % genera los vecinos del nodo - TO-DO creo que ta
 	agregarAVisitados(Nodo, Visitados, NuevosVisitados), % agrega el nodo a lista de visitados
 	agregar(FronteraSinNodo, Vecinos, NuevaFrontera, NuevosVisitados, Nodo, Metas), % agrega vecinos a la frontera - TO-DO
 	buscar(NuevaFrontera, NuevosVisitados, Metas, MM). % continua la busqueda con la nueva frontera
+	
+	
+generarVecinos(Nodo,Vecinos):- Nodo = [Id,_], node(Id,_,_,_,Vecinos).
+
+%agregar(FronteraSinNodo,Vecinos,NuevaFrontera,NuevosVisitados,Nodo,Metas):-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 %

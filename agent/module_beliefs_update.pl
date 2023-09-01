@@ -31,13 +31,25 @@
 % Pueden realizar todos los cambios de implementación que consideren necesarios.
 % Esta implementación busca ser un marco para facilitar la resolución del proyecto.
 
+update_beliefs(Perc):- forall(Rel,Perc),
+		       update(Rel),
+		       updateUnseen(Rel,)
 
-update_beliefs(Perc):- forall(Rel,Perc),update(Rel)
+update(T):- T = time(_), 
+	    retract(time(_)), 
+	    assert(T).
 
-update(Perc):- Perc = time(_), retract(time(_)), assert(Perc).
+update(D):- D = direction(_), 
+	    retract(direction(_)), 
+	    assert(D).
 
-update(Perc):- Perc = direction(_), retract(direction(_)), assert(Perc).
+update(A):- A = at(IdNodo,TipoEntidad,IdEntidad), 
+	    retract(at(IdNodo,_,_)), 
+	    assert(A).
 
-update(Perc):- Perc = at(IdNodo,TipoEntidad,IdEntidad), retract(IdNodo,_,_), assert(Perc).
+update(N):- N = node(Id, PosX, PosY, Costo, Conexiones), 
+	    retract(at(Id,_,_)), 
+	    retract(node(Id,_,_,_)), 
+	    assert(node(Id, PosX, PosY, Costo, Conexiones))
 
-update(Perc):- Perc = node(Id, PosX, PosY, Costo, Conexiones), retract(node(Id, PosX, PosY, _, _)), assert(Perc).
+

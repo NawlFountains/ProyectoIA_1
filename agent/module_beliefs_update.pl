@@ -31,25 +31,45 @@
 % Pueden realizar todos los cambios de implementación que consideren necesarios.
 % Esta implementación busca ser un marco para facilitar la resolución del proyecto.
 
-update_beliefs(Perc):- forall(Rel,Perc),
-		       update(Rel),
-		       updateUnseen(Rel,)
+
+
+update_beliefs([]).
+update_beliefs([Perc|Rest]):- update(Perc),
+		       	      update_beliefs(Rest).
 
 update(T):- T = time(_), 
-	    retract(time(_)), 
+	    retract(time(_)),!, 
 	    assert(T).
+	    
+update(T):- T = time(_), 
+	    assert(T).
+	 
 
 update(D):- D = direction(_), 
-	    retract(direction(_)), 
+	    retract(direction(_)),!, 
+	    assert(D).
+	    
+update(D):- D = direction(_), 
 	    assert(D).
 
 update(A):- A = at(IdNodo,TipoEntidad,IdEntidad), 
-	    retract(at(IdNodo,_,_)), 
+	    retract(at(IdNodo,_,_)),!, 
 	    assert(A).
+	 
+update(A):- A = at(IdNodo,TipoEntidad,IdEntidad),
+	    assert(A).
+	   
 
 update(N):- N = node(Id, PosX, PosY, Costo, Conexiones), 
-	    retract(at(Id,_,_)), 
-	    retract(node(Id,_,_,_)), 
-	    assert(node(Id, PosX, PosY, Costo, Conexiones))
+	    retract(at(Id,_,_)),!, 
+	    retract(node(Id,_,_,_)),!, 
+	    assert(node(Id, PosX, PosY, Costo, Conexiones)).
+
+update(N):- N = node(Id, PosX, PosY, Costo, Conexiones),  
+	    retract(node(Id,_,_,_)),!,
+	    assert(node(Id, PosX, PosY, Costo, Conexiones)).
+	   
+update(N):- N = node(Id, PosX, PosY, Costo, Conexiones),  
+	    assert(node(Id, PosX, PosY, Costo, Conexiones)).
 
 

@@ -63,6 +63,7 @@ crearPlan(Camino, Plan):-
 % usando A* (buscarEstrella/5)
 %
 
+
 buscar_plan_desplazamiento(Metas, Plan, Destino, Costo):-
 	forall(member(Meta, Metas), assert(esMeta(Meta))),
 	at(MyNode, agente, me),
@@ -71,11 +72,9 @@ buscar_plan_desplazamiento(Metas, Plan, Destino, Costo):-
 	!,
 	retractall(raiz(_)),
 	assert(raiz(MyNode)),
-	write('Apunto de buscar estrella'),
 	buscarEstrella([[MyNode, 0]], Metas, Camino, Costo, Destino),
-	write('Fin de busqueda estrella'),
 	crearPlan(Camino, Plan),
-	write('Plan creado exito').
+	retractall(padre(_,_)). % Si no lo quitamos sigue buscando distintas soluciones no validas
 	
 buscar_plan_desplazamiento(_, [], [], 0).
 
@@ -87,12 +86,8 @@ buscar_plan_desplazamiento(_, [], [], 0).
 %
 	
 buscarEstrella(Frontera, Metas, Camino, Costo, Destino):-
-	write('En busqueda estrella por comenzar'),
 	buscar(Frontera, [], Metas, Destino),
-	write('Termino el predicado buscar/4'),
 	encontrarCamino(Destino, C),
-	write('Encontrar camino devolvio'),
-	write(C),
 	append([Destino], C, C2),	
 	reverse(C2, C3),
 	costoCamino(C3, Costo),
@@ -118,7 +113,6 @@ buscarEstrella(Frontera, Metas, Camino, Costo, Destino):-
 buscar(Frontera, _, _M, Nodo):-
 	seleccionar([Nodo, _], Frontera, _),
 	esMeta(Nodo),
-	write('Encontro el nodo meta'),
 	!.
 
 buscar(Frontera, Visitados, Metas, MM):-
@@ -129,7 +123,15 @@ buscar(Frontera, Visitados, Metas, MM):-
 	buscar(NuevaFrontera, NuevosVisitados, Metas, MM). % continua la busqueda con la nueva frontera
 	
 	
-generarVecinos(Nodo,Vecinos):- Nodo = [Id,_], node(Id,_,_,_,Vecinos).
+%
+% generarVecinos(+Nodo,-Vecinos)
+% % Dado un nodo se obtienes sus nodos vecinos, aquellos en conexiones, % y se les suma el coste de pasar por este nodo % generarVecinos(Nodo,Vecinos):- Aux = [], Nodo = [Id,CostoNodo], 
+generarVecinos(Nodo,Vecinos):-
+		Nodo = [Id,CostoNodo],
+		node(Id,_,_,_,Conexiones),
+		!,
+		findall([IDVecino,CostoVecinoPasando], (member([IDVecino,CostoVecinoSolo],Conexiones),
+			CostoVecinoPasando is CostoVecinoSolo + CostoNodo), Vecinos).
 
 %agregar(FronteraSinNodo,Vecinos,NuevaFrontera,NuevosVisitados,Nodo,Metas):-
 
@@ -140,7 +142,7 @@ agregar(FronteraSinNodo, Vecinos, NuevaFrontera, NuevosVisitados, Nodo, Metas):-
 	subtract(VecinosNoVisitados,FronteraSinNodo,VecinosNoFrontera),
 	% Necesitamos establecer relacion padre e hijo
 	Nodo = [P,_],
-	forall(member([N,_],VecinosNoFrontera), assert(padre(P,N))),
+	forall(member([N,_],VecinosNoFrontera), assert(padre(N,P))),
 	% Habria que calcular f(n) en algun momento
         append(FronteraSinNodo,VecinosNoFrontera,NuevaFrontera).
 
@@ -151,6 +153,13 @@ agregar(FronteraSinNodo, Vecinos, NuevaFrontera, NuevosVisitados, Nodo, Metas):-
 %
 agregarAVisitados(Nodo, Visitados, [Nodo | Visitados]).
 
+%
+% calcularCosto(+Nodos,+Metas,-NodosConCosto)
+%
+% Dada una lista de Nodos y un conjunto de metas calcula el costo
+% dada la funcion f(n) = coste(n) + heuristica(n).
+
+calcularCosto(Nodos, Metas, NodosConCosto).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % costoCamino(+Lista, ?Costo)

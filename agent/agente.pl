@@ -52,6 +52,18 @@
 run(Perc, Action, Text, Beliefs):-
 	update_beliefs(Perc), % implementado en module_beliefs_update
 	decide_action(Action, Text),
+	
+	at(CN, agente, me), 
+       	write('Agente en '),
+	write(CN),
+	node(CN,_,_,_,Con),
+	write('\nNodos adyacentes al del agente\n'),
+	forall(member(X,Con),write(X)),
+	write('\n'),
+	write('Accion '),
+	write(Action),
+	write(Text),
+	write('\n'),
 	findall(at(X, Y, Z), at(X, Y, Z), Beliefs).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -64,10 +76,10 @@ run(Perc, Action, Text, Beliefs):-
 %
 % En la implementación siguiente:
 % El primer caso (1), sirve de ejemplo para levantar un objeto del terreno.
-% El segundo caso (2) del predicado siempre tiene éxito, y hace que el agente se mueva de manera aleatoria.
-% El tercer caso (3) permite al agente ejecutar la siguiente acción de movimiento de un plan guardado, calculado previamente.
-% El cuarto caso (4) permite obtener un nuevo plan de movimiento usando A*.
-% El quinto caso (5) hace que el agente gire en su posición, en sentido horario.
+% El segundo caso (2) permite al agente ejecutar la siguiente acción de movimiento de un plan guardado, calculado previamente.
+% El tercer caso (3) permite obtener un nuevo plan de movimiento usando A*.
+% El cuarto caso (4) hace que el agente gire en su posición, en sentido horario.
+% El quinto caso (5) del predicado siempre tiene éxito, y hace que el agente se mueva de manera aleatoria.
 %
 % Deberán completar la implementación del algoritmo de búsqueda A* para que funcionen los casos (3) y (4)
 % Y eliminar el caso (2), para permitir al agente seguir el plan de movimientos.
@@ -83,15 +95,6 @@ decide_action(Action, 'Quiero levantar una copa...'):-
     Action = levantar_tesoro(IdGold, PosX, PosY),
     retractall(at(MyNode, _, IdGold)),
 	retractall(plandesplazamiento(_)).
-
-% Me muevo a una posición vecina seleccionada de manera aleatoria.
-decide_action(Action, 'Me muevo a la posicion de al lado...'):-
-	at(MyNode, agente, me),
-	node(MyNode, _, _, _, AdyList),
-	length(AdyList, LenAdyList), LenAdyList > 0,
-	random_member([IdAdyNode, _CostAdyNode], AdyList),
-	!,
-	Action = avanzar(IdAdyNode).
 
 % Si tengo un plan de movimientos, ejecuto la siguiente acción.
 decide_action(Action, 'Avanzar...'):-
@@ -124,6 +127,15 @@ decide_action(Action, 'Girar para conocer el territorio...'):-
 				)			
 			)	
 	).
+
+% Me muevo a una posición vecina seleccionada de manera aleatoria.
+decide_action(Action, 'Me muevo a la posicion de al lado...'):-
+	at(MyNode, agente, me),
+	node(MyNode, _, _, _, AdyList),
+	length(AdyList, LenAdyList), LenAdyList > 0,
+	random_member([IdAdyNode, _CostAdyNode], AdyList),
+	!,
+	Action = avanzar(IdAdyNode).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %

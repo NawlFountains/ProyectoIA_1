@@ -34,42 +34,26 @@
 
 
 update_beliefs([]).
-update_beliefs([Perc|Rest]):- update(Perc),
-		       	      update_beliefs(Rest).
+update_beliefs(Perc):- forall(member(Rel,Perc),update(Rel)). 
+		       	     
 
 update(T):- T = time(_), 
-	    retract(time(_)),!, 
+	    retractall(time(_)),
 	    assert(T).
-	    
-update(T):- T = time(_), 
-	    assert(T).
-	 
 
 update(D):- D = direction(_), 
-	    retract(direction(_)),!, 
-	    assert(D).
-	    
-update(D):- D = direction(_), 
+	    retractall(direction(_)),
 	    assert(D).
 
 update(A):- A = at(IdNodo,TipoEntidad,IdEntidad), 
-	    retract(at(IdNodo,_,_)),!, 
+	    TipoEntidad \= agente,
 	    assert(A).
-	 
-update(A):- A = at(IdNodo,TipoEntidad,IdEntidad),
+update(A):- A = at(IdNodo,agente,IdEntidad),
+	    retractall(at(_,agente,_)),
 	    assert(A).
-	   
 
 update(N):- N = node(Id, PosX, PosY, Costo, Conexiones), 
-	    retract(at(Id,_,_)),!, 
-	    retract(node(Id,_,_,_)),!, 
+	    retractall(at(Id,_,_)), 
+	    retractall(node(Id,_,_,_)), 
 	    assert(node(Id, PosX, PosY, Costo, Conexiones)).
-
-update(N):- N = node(Id, PosX, PosY, Costo, Conexiones),  
-	    retract(node(Id,_,_,_)),!,
-	    assert(node(Id, PosX, PosY, Costo, Conexiones)).
-	   
-update(N):- N = node(Id, PosX, PosY, Costo, Conexiones),  
-	    assert(node(Id, PosX, PosY, Costo, Conexiones)).
-
 

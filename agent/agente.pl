@@ -88,31 +88,111 @@ run(Perc, Action, Text, Beliefs):-
 % Esta implementación busca ser un marco para facilitar la resolución del proyecto.
 
 % Si estoy en la misma posición que una copa, intento levantarla.
+decide_action(Action, 'Quiero levantar una diamante...'):-
+    at(MyNode, agente, me),
+    at(MyNode, diamante, IdDiamante),
+    node(MyNode, PosX, PosY, _, _),
+    Action = levantar_tesoro(IdDiamante, PosX, PosY),
+    !,
+    retractall(at(MyNode, _, IdDiamante)),
+	retractall(plandesplazamiento(_)).
+
+decide_action(Action, 'Quiero levantar un cofre...'):-
+    at(MyNode, agente, me),
+    at(MyNode, cofre, IdCofre),
+    node(MyNode, PosX, PosY, _, _),
+    Action = levantar_tesoro(IdCofre, PosX, PosY),
+    !,
+    retractall(at(MyNode, _, IdCofre)),
+	retractall(plandesplazamiento(_)).
+
 decide_action(Action, 'Quiero levantar una copa...'):-
     at(MyNode, agente, me),
     at(MyNode, copa, IdGold),
     node(MyNode, PosX, PosY, _, _),
     Action = levantar_tesoro(IdGold, PosX, PosY),
+    !,
     retractall(at(MyNode, _, IdGold)),
 	retractall(plandesplazamiento(_)).
+
+decide_action(Action, 'Quiero levantar un reloj...'):-
+    at(MyNode, agente, me),
+    at(MyNode, reloj, IdReloj),
+    node(MyNode, PosX, PosY, _, _),
+    Action = levantar_tesoro(IdReloj, PosX, PosY),
+    !,
+    retractall(at(MyNode, _, IdReloj)),
+	retractall(plandesplazamiento(_)).
+
+
+
+decide_action(Action, 'Quiero levantar una pocion...'):-
+    at(MyNode, agente, me),
+    at(MyNode, pocion, IdPocion),
+    node(MyNode, PosX, PosY, _, _),
+    Action = levantar_tesoro(IdPocion, PosX, PosY),
+    !,
+    retractall(at(MyNode, _, IdPocion)),
+	retractall(plandesplazamiento(_)).
+
+
 
 % Si tengo un plan de movimientos, ejecuto la siguiente acción.
 decide_action(Action, 'Avanzar...'):-
 	plandesplazamiento(Plan),
+	write('Se detecto que hay un plan\n'),
 	length(Plan, LargoPlan),
 	LargoPlan > 0,
+	write('El plan tiene mas de un paso'),
 	!,
 	obtenerMovimiento(Plan, Destino, Resto),
 	retractall(plandesplazamiento(_)),
+	write('Se quito todos los planes previos y la accion sera '),
 	assert(plandesplazamiento(Resto)),
 	Action = Destino.
 	
 % Si no tengo un plan guardado, busco uno nuevo.
-decide_action(Action, 'Avanzar con nuevo plan...'):-
- 	busqueda_plan(Plan, _Destino, _Costo),
+
+decide_action(Action, 'Avanzar con nuevo plan diamante...'):-
+ 	busqueda_plan(diamante,Plan, _Destino, _Costo),
 	Plan \= [],
 	obtenerMovimiento(Plan, Action, Resto),
+	!,
 	assert(plandesplazamiento(Resto)).
+
+decide_action(Action, 'Avanzar con nuevo plan cofre...'):-
+ 	busqueda_plan(cofre,Plan, _Destino, _Costo),
+	Plan \= [],
+	obtenerMovimiento(Plan, Action, Resto),
+	!,
+	assert(plandesplazamiento(Resto)).
+
+decide_action(Action, 'Avanzar con nuevo plan copa...'):-
+ 	busqueda_plan(copa,Plan, _Destino, _Costo),
+	Plan \= [],
+	obtenerMovimiento(Plan, Action, Resto),
+	!,
+	write('Plan es \n'),
+	write(Plan),write('\n'),
+	write('Accion a enviar desde decide es : '),
+	write(Action),write('\n'),
+	assert(plandesplazamiento(Resto)).
+
+decide_action(Action, 'Avanzar con nuevo plan reloj...'):-
+ 	busqueda_plan(reloj,Plan, _Destino, _Costo),
+	Plan \= [],
+	obtenerMovimiento(Plan, Action, Resto),
+	!,
+	assert(plandesplazamiento(Resto)).
+
+
+decide_action(Action, 'Avanzar con nuevo plan pocion...'):-
+ 	busqueda_plan(pocion,Plan, _Destino, _Costo),
+	Plan \= [],
+	obtenerMovimiento(Plan, Action, Resto),
+	!,
+	assert(plandesplazamiento(Resto)).
+
 
 % Giro en sentido horario, para conocer mas terreno.
 decide_action(Action, 'Girar para conocer el territorio...'):-
@@ -152,9 +232,9 @@ obtenerMovimiento([X|Xs], X, Xs).
 %
 % Busca un plan de desplazamiento hacia el tesoro que se encuentre mas cerca.
 %	
-busqueda_plan(Plan, Destino, Costo):-
+busqueda_plan(IdItem,Plan, Destino, Costo):-
  	retractall(plandesplazamiento(_)),
  	retractall(esMeta(_)),
- 	findall(Nodo, at(Nodo, copa, _), Metas), % nuevas metas
+ 	findall(Nodo, at(Nodo, IdItem, _), Metas), % nuevas metas
 
  	buscar_plan_desplazamiento(Metas, Plan, Destino, Costo). % implementado en module_path_finding

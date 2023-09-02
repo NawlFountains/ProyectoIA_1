@@ -74,6 +74,7 @@ buscar_plan_desplazamiento(Metas, Plan, Destino, Costo):-
 	assert(raiz(MyNode)),
 	buscarEstrella([[MyNode, 0]], Metas, Camino, Costo, Destino),
 	crearPlan(Camino, Plan),
+	!,
 	retractall(padre(_,_)). % Si no lo quitamos sigue buscando distintas soluciones no validas
 	
 buscar_plan_desplazamiento(_, [], [], 0).

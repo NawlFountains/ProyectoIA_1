@@ -138,13 +138,26 @@ generarVecinos(Nodo,Vecinos):-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 
 agregar(FronteraSinNodo, Vecinos, NuevaFrontera, NuevosVisitados, Nodo, Metas):-
-	subtract(Vecinos,NuevosVisitados,VecinosNoVisitados),
-	subtract(VecinosNoVisitados,FronteraSinNodo,VecinosNoFrontera),
+	quitarNodosRepetidos(Vecinos,NuevosVisitados,VecinosNoVisitados),
+	quitarNodosRepetidos(VecinosNoVisitados,FronteraSinNodo,VecinosNoFrontera),
 	% Necesitamos establecer relacion padre e hijo
 	Nodo = [P,_],
 	forall(member([N,_],VecinosNoFrontera), assert(padre(N,P))),
 	% Habria que calcular f(n) en algun momento
         append(FronteraSinNodo,VecinosNoFrontera,NuevaFrontera).
+
+%
+% quitarNodosRepetidos(+NodosOrigen, +NodosNoRepetir, -NodosSinRepetir)
+%
+% Similar a como funciona el operador - en conjuntos, permanecen 
+% los nodos que se encuentran en NodosOrigen cuya Id no se encuentre
+% en algun nodo de NodosNoRepetir.
+%
+% No se puede hacer con un subtract porque deben ser completamente identicos
+% los nodos y el costo puede que sea distinto.
+
+quitarNodosRepetidos(NodosOrigen,NodosNoRepetir,NodosSinRepetir):-
+	findall(NodoSoloEnOrigen, (NodoSoloEnOrigen = [ID,_], member(NodoSoloEnOrigen,NodosOrigen), not(member([ID, _], NodosNoRepetir))), NodosSinRepetir).
 
 %
 % agregarAVisitados(+Nodo, +Visitados, ?VisitadosConNodo)

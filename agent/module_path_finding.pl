@@ -71,8 +71,11 @@ buscar_plan_desplazamiento(Metas, Plan, Destino, Costo):-
 	!,
 	retractall(raiz(_)),
 	assert(raiz(MyNode)),
+	write('Apunto de buscar estrella'),
 	buscarEstrella([[MyNode, 0]], Metas, Camino, Costo, Destino),
-	crearPlan(Camino, Plan).
+	write('Fin de busqueda estrella'),
+	crearPlan(Camino, Plan),
+	write('Plan creado exito').
 	
 buscar_plan_desplazamiento(_, [], [], 0).
 
@@ -84,8 +87,12 @@ buscar_plan_desplazamiento(_, [], [], 0).
 %
 	
 buscarEstrella(Frontera, Metas, Camino, Costo, Destino):-
+	write('En busqueda estrella por comenzar'),
 	buscar(Frontera, [], Metas, Destino),
+	write('Termino el predicado buscar/4'),
 	encontrarCamino(Destino, C),
+	write('Encontrar camino devolvio'),
+	write(C),
 	append([Destino], C, C2),	
 	reverse(C2, C3),
 	costoCamino(C3, Costo),
@@ -111,6 +118,7 @@ buscarEstrella(Frontera, Metas, Camino, Costo, Destino):-
 buscar(Frontera, _, _M, Nodo):-
 	seleccionar([Nodo, _], Frontera, _),
 	esMeta(Nodo),
+	write('Encontro el nodo meta'),
 	!.
 
 buscar(Frontera, Visitados, Metas, MM):-
@@ -126,6 +134,16 @@ generarVecinos(Nodo,Vecinos):- Nodo = [Id,_], node(Id,_,_,_,Vecinos).
 %agregar(FronteraSinNodo,Vecinos,NuevaFrontera,NuevosVisitados,Nodo,Metas):-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+
+agregar(FronteraSinNodo, Vecinos, NuevaFrontera, NuevosVisitados, Nodo, Metas):-
+	subtract(Vecinos,NuevosVisitados,VecinosNoVisitados),
+	subtract(VecinosNoVisitados,FronteraSinNodo,VecinosNoFrontera),
+	% Necesitamos establecer relacion padre e hijo
+	Nodo = [P,_],
+	forall(member([N,_],VecinosNoFrontera), assert(padre(P,N))),
+	% Habria que calcular f(n) en algun momento
+        append(FronteraSinNodo,VecinosNoFrontera,NuevaFrontera).
+
 %
 % agregarAVisitados(+Nodo, +Visitados, ?VisitadosConNodo)
 %

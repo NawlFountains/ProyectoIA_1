@@ -118,7 +118,7 @@ buscar(Frontera, _, _M, Nodo):-
 
 buscar(Frontera, Visitados, Metas, MM):-
 	seleccionar(Nodo, Frontera, FronteraSinNodo), % selecciona primer nodo de la frontera
-	generarVecinos(Nodo, Vecinos), % genera los vecinos del nodo - TO-DO creo que ta
+	generarVecinos(Nodo, Vecinos), % genera los vecinos del nodo - TO-DO
 	agregarAVisitados(Nodo, Visitados, NuevosVisitados), % agrega el nodo a lista de visitados
 	agregar(FronteraSinNodo, Vecinos, NuevaFrontera, NuevosVisitados, Nodo, Metas), % agrega vecinos a la frontera - TO-DO
 	buscar(NuevaFrontera, NuevosVisitados, Metas, MM). % continua la busqueda con la nueva frontera
@@ -131,10 +131,9 @@ generarVecinos(Nodo,Vecinos):-
 		Nodo = [Id,CostoNodo],
 		node(Id,_,_,_,Conexiones),
 		!,
-		findall([IDVecino,CostoVecinoPasando], (member([IDVecino,CostoVecinoSolo],Conexiones),
-			CostoVecinoPasando is CostoVecinoSolo + CostoNodo), Vecinos).
+		findall([IDVecino,CostoVecinoPasando], (member([IDVecino,CostoVecinoSolo],Conexiones), CostoVecinoPasando is CostoVecinoSolo + CostoNodo), Vecinos).
 
-%agregar(FronteraSinNodo,Vecinos,NuevaFrontera,NuevosVisitados,Nodo,Metas):-
+% agregar(FronteraSinNodo,Vecinos,NuevaFrontera,NuevosVisitados,Nodo,Metas):-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 
@@ -142,10 +141,11 @@ agregar(FronteraSinNodo, Vecinos, NuevaFrontera, NuevosVisitados, Nodo, Metas):-
 	quitarNodosRepetidos(Vecinos,NuevosVisitados,VecinosNoVisitados),
 	quitarNodosRepetidos(VecinosNoVisitados,FronteraSinNodo,VecinosNoFrontera),
 	% Necesitamos establecer relacion padre e hijo
-	Nodo = [P,_],
+	Nodo = [P,CostoNodo],
 	forall(member([N,_],VecinosNoFrontera), assert(padre(N,P))),
-	% Habria que calcular f(n) en algun momento
-        append(FronteraSinNodo,VecinosNoFrontera,NuevaFrontera).
+	obtenerMasCercano(Nodo,Metas,MetaMasCercana),
+	calcularCosto(VecinosNoFrontera,MetaMasCercana,VecinosNoFronteraConCosto),
+	insertarListaOrdenada(VecinosNoFronteraConCosto,FronteraSinNodo,NuevaFrontera).
 
 %
 % quitarNodosRepetidos(+NodosOrigen, +NodosNoRepetir, -NodosSinRepetir)
@@ -168,12 +168,12 @@ quitarNodosRepetidos(NodosOrigen,NodosNoRepetir,NodosSinRepetir):-
 agregarAVisitados(Nodo, Visitados, [Nodo | Visitados]).
 
 %
-% calcularCosto(+Nodos,+Metas,-NodosConCosto)
+% calcularCosto(+Nodos,+Meta,-NodosConCosto)
 %
 % Dada una lista de Nodos y un conjunto de metas calcula el costo
 % dada la funcion f(n) = coste(n) + heuristica(n).
 
-calcularCosto(Nodos, Metas, NodosConCosto).
+calcularCosto(Nodos, Meta, NodosConCosto):- findall([Id,Costo is CostoActual + CostoHeuristica],(member([Id,CostoActual],Nodos), calcularH([Id,_],Meta,CostoHeuristica)),NodosConCosto).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % costoCamino(+Lista, ?Costo)
@@ -205,3 +205,28 @@ distance([X1, Y1], [X2, Y2], Distance):-
 	DX is X2 - X1,
 	DY is Y2 - Y1,
 	Distance is sqrt(DX^2 + DY^2).
+
+
+obtenerMasCercano(Node,[Meta],Meta).
+obtenerMasCercano(Node,[Meta|ListaMetas],MetaMasCercana):- 
+	obtenerMasCercano(Node,ListaMetas,MetaMasCercanaAux),
+	masCerca(Node,Meta,MetaMasCercanaAux,MetaMasCercana).
+
+masCerca(Node,MetaA,MetaB,MetaA):- calcularH(Node,MetaA,HA),calcularH(Node,MetaB,HB),HA=<HB.
+masCerca(Node,MetaA,MetaB,MetaB):- calcularH(Node,MetaA,HA),calcularH(Node,MetaB,HB),HA>HB.
+
+
+insertarListaOrdenada([],Lista,Lista).
+insertarListaOrdenada([Nodo|RestoLista],Lista,Resultado):- insertarOrdenado(Nodo,Lista,ListaOrdenada),insertarListaOrdenada(RestoLista,ListaOrdenada,Resultado).
+
+insertarOrdenado(Nodo,[],[Nodo]).
+
+insertarOrdenado(Nodo, [PrimerNodo|RestoLista], [Nodo, PrimerNodo|RestoLista]):-Nodo = [_, Costo],
+    																			PrimerNodo = [_, CostoPrimerNodo],
+    																			Costo =< CostoPrimerNodo.
+
+insertarOrdenado(Nodo,[PrimerNodo|RestoLista],[PrimerNodo|Resultado]):- Nodo = [_,Costo],
+																		PrimerNodo = [_,CostoPrimerNodo],
+																		Costo > CostoPrimerNodo,
+																		insertarOrdenado(Nodo,RestoLista,Resultado).
+											

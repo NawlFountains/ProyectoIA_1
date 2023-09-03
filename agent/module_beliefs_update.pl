@@ -54,6 +54,6 @@ update(A):- A = at(IdNodo,agente,IdEntidad),
 
 update(N):- N = node(Id, PosX, PosY, Costo, Conexiones), 
 	    retractall(at(Id,_,_)), 
-	    retractall(node(Id,_,_,_)), 
+	    retractall(node(Id,_,_,_,_)), 
 	    assert(node(Id, PosX, PosY, Costo, Conexiones)).
 

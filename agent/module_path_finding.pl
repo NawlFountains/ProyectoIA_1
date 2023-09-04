@@ -143,7 +143,7 @@ agregar(FronteraSinNodo, Vecinos, NuevaFrontera, NuevosVisitados, Nodo, Metas):-
 	% Necesitamos establecer relacion padre e hijo
 	Nodo = [P,CostoNodo],
 	forall(member([N,_],VecinosNoFrontera), assert(padre(N,P))),
-	obtenerMasCercano(Nodo,Metas,MetaMasCercana),
+	obtenerMasCercano(P,Metas,MetaMasCercana),
 	calcularCosto(VecinosNoFrontera,MetaMasCercana,VecinosNoFronteraConCosto),
 	insertarListaOrdenada(VecinosNoFronteraConCosto,FronteraSinNodo,NuevaFrontera).
 
@@ -173,7 +173,7 @@ agregarAVisitados(Nodo, Visitados, [Nodo | Visitados]).
 % Dada una lista de Nodos y un conjunto de metas calcula el costo
 % dada la funcion f(n) = coste(n) + heuristica(n).
 
-calcularCosto(Nodos, Meta, NodosConCosto):- findall([Id,Costo is CostoActual + CostoHeuristica],(member([Id,CostoActual],Nodos), calcularH([Id,_],Meta,CostoHeuristica)),NodosConCosto).
+calcularCosto(Nodos, Meta, NodosConCosto):- findall([Id,Costo],(member([Id,CostoActual],Nodos), calcularH(Id,Meta,CostoHeuristica), Costo is CostoActual + CostoHeuristica),NodosConCosto).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % costoCamino(+Lista, ?Costo)
@@ -207,13 +207,13 @@ distance([X1, Y1], [X2, Y2], Distance):-
 	Distance is sqrt(DX^2 + DY^2).
 
 
-obtenerMasCercano(Node,[Meta],Meta).
+obtenerMasCercano(Node,[Meta],Meta) :- !.
 obtenerMasCercano(Node,[Meta|ListaMetas],MetaMasCercana):- 
 	obtenerMasCercano(Node,ListaMetas,MetaMasCercanaAux),
 	masCerca(Node,Meta,MetaMasCercanaAux,MetaMasCercana).
 
-masCerca(Node,MetaA,MetaB,MetaA):- calcularH(Node,MetaA,HA),calcularH(Node,MetaB,HB),HA=<HB.
-masCerca(Node,MetaA,MetaB,MetaB):- calcularH(Node,MetaA,HA),calcularH(Node,MetaB,HB),HA>HB.
+masCerca(Node,MetaA,MetaB,MetaA):- calcularH(Node,MetaA,HA),calcularH(Node,MetaB,HB),HA=<HB, !.
+masCerca(Node,MetaA,MetaB,MetaB).
 
 
 insertarListaOrdenada([],Lista,Lista).

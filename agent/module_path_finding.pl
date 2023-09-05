@@ -206,27 +206,46 @@ distance([X1, Y1], [X2, Y2], Distance):-
 	DY is Y2 - Y1,
 	Distance is sqrt(DX^2 + DY^2).
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%obtenerMasCercano(+Node,+ListaMetas,-MetaMasCernada)
+%
+%Obtiene la meta mas cercana de una lista de metas dado un nodo.
+%
 obtenerMasCercano(Node,[Meta],Meta) :- !.
 obtenerMasCercano(Node,[Meta|ListaMetas],MetaMasCercana):- 
 	obtenerMasCercano(Node,ListaMetas,MetaMasCercanaAux),
 	masCerca(Node,Meta,MetaMasCercanaAux,MetaMasCercana).
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%masCerca(+Node,+MetaA,+MetaB,-MetaMasCerca)
+%
+%Dada dos Metas define cual es la mas cercana a Node segun la distancia euclidia.
 
 masCerca(Node,MetaA,MetaB,MetaA):- calcularH(Node,MetaA,HA),calcularH(Node,MetaB,HB),HA=<HB, !.
 masCerca(Node,MetaA,MetaB,MetaB).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%insertarListaOrdenada(+ListaAinsertar,+ListaBase,-ListaInsertadaOrdenada)
+%
+%Dada una lista de nodos a insertar inserta cada nodo de forma ordenada en la lista base y lo retorna en la ListaInsertadaOrdena
 
 insertarListaOrdenada([],Lista,Lista).
 insertarListaOrdenada([Nodo|RestoLista],Lista,Resultado):- insertarOrdenado(Nodo,Lista,ListaOrdenada),insertarListaOrdenada(RestoLista,ListaOrdenada,Resultado).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%insertarOrdenado(+Nodo,Lista,ListaConNodoInsertado)
+% 
+%Dado un nodo y una lista inserta el nodo de forma ordenada en la lista.
 insertarOrdenado(Nodo,[],[Nodo]).
-
 insertarOrdenado(Nodo, [PrimerNodo|RestoLista], [Nodo, PrimerNodo|RestoLista]):-Nodo = [_, Costo],
-    																			PrimerNodo = [_, CostoPrimerNodo],
-    																			Costo =< CostoPrimerNodo.
-
+										PrimerNodo = [_, CostoPrimerNodo],
+										Costo =< CostoPrimerNodo.
+										
 insertarOrdenado(Nodo,[PrimerNodo|RestoLista],[PrimerNodo|Resultado]):- Nodo = [_,Costo],
-																		PrimerNodo = [_,CostoPrimerNodo],
-																		Costo > CostoPrimerNodo,
-																		insertarOrdenado(Nodo,RestoLista,Resultado).
-											
+									PrimerNodo = [_,CostoPrimerNodo],
+									Costo > CostoPrimerNodo,
+									insertarOrdenado(Nodo,RestoLista,Resultado).								

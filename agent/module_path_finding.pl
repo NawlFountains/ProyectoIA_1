@@ -237,7 +237,7 @@ insertarListaOrdenada([Nodo|RestoLista],Lista,Resultado):- insertarOrdenado(Nodo
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%insertarOrdenado(+Nodo,Lista,ListaConNodoInsertado)
+%insertarOrdenado(+Nodo,+Lista,-ListaConNodoInsertado)
 % 
 %Dado un nodo y una lista inserta el nodo de forma ordenada en la lista.
 insertarOrdenado(Nodo,[],[Nodo]).

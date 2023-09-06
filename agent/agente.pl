@@ -79,10 +79,6 @@ run(Perc, Action, Text, Beliefs):-
 % El segundo caso (2) permite al agente ejecutar la siguiente acción de movimiento de un plan guardado, calculado previamente.
 % El tercer caso (3) permite obtener un nuevo plan de movimiento usando A*.
 % El cuarto caso (4) hace que el agente gire en su posición, en sentido horario.
-% El quinto caso (5) del predicado siempre tiene éxito, y hace que el agente se mueva de manera aleatoria.
-%
-% Deberán completar la implementación del algoritmo de búsqueda A* para que funcionen los casos (3) y (4)
-% Y eliminar el caso (2), para permitir al agente seguir el plan de movimientos.
 %
 % Pueden realizar todos los cambios de implementación que consideren necesarios.
 % Esta implementación busca ser un marco para facilitar la resolución del proyecto.
@@ -136,15 +132,6 @@ decide_action(Action, 'Girar para conocer el territorio...'):-
 			)	
 	).
 
-% Me muevo a una posición vecina seleccionada de manera aleatoria.
-decide_action(Action, 'Me muevo a la posicion de al lado...'):-
-	at(MyNode, agente, me),
-	node(MyNode, _, _, _, AdyList),
-	length(AdyList, LenAdyList), LenAdyList > 0,
-	random_member([IdAdyNode, _CostAdyNode], AdyList),
-	!,
-	Action = avanzar(IdAdyNode).
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % obtenerMovimiento(?Lista, ?Movimiento, ?Resto)
@@ -161,12 +148,16 @@ obtenerMovimiento([X|Xs], X, Xs).
 % Busca un plan de desplazamiento hacia el tesoro que se encuentre mas cerca.
 %	
 busqueda_plan(Plan, Destino, Costo):-
-	write('en busqueda plan'),
  	retractall(plandesplazamiento(_)),
  	retractall(esMeta(_)),
-	write('\nPor hacer findall'),
  	findall(Nodo, (at(Nodo, TipoEntidad, _) ,TipoEntidad \= agente), Metas), % nuevas metas
-	write('Las metas son '),write(Metas),
  	buscar_plan_desplazamiento(Metas, Plan, Destino, Costo). % implementado en module_path_finding
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% sigue_meta
+%
+% Evalua si en el plan de desplazamiento actual todavia esta el objeto
+% que se esta yendo a buscar o si desaparecio.
+%
 sigue_meta:- meta_en(Destino) , at(Destino,_,_). 

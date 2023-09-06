@@ -118,12 +118,12 @@ buscar(Frontera, _, _M, Nodo):-
 
 buscar(Frontera, Visitados, Metas, MM):-
 	seleccionar(Nodo, Frontera, FronteraSinNodo), % selecciona primer nodo de la frontera
-	generarVecinos(Nodo, Vecinos), % genera los vecinos del nodo - TO-DO
+	generarVecinos(Nodo, Vecinos), % genera los vecinos del nodo 
 	agregarAVisitados(Nodo, Visitados, NuevosVisitados), % agrega el nodo a lista de visitados
-	agregar(FronteraSinNodo, Vecinos, NuevaFrontera, NuevosVisitados, Nodo, Metas), % agrega vecinos a la frontera - TO-DO
+	agregar(FronteraSinNodo, Vecinos, NuevaFrontera, NuevosVisitados, Nodo, Metas), % agrega vecinos a la frontera
 	buscar(NuevaFrontera, NuevosVisitados, Metas, MM). % continua la busqueda con la nueva frontera
 	
-	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 %
 % generarVecinos(+Nodo,-Vecinos)
 % % Dado un nodo se obtienes sus nodos vecinos, aquellos en conexiones, % y se les suma el coste de pasar por este nodo % generarVecinos(Nodo,Vecinos):- Aux = [], Nodo = [Id,CostoNodo], 
@@ -133,9 +133,14 @@ generarVecinos(Nodo,Vecinos):-
 		!,
 		findall([IDVecino,CostoVecinoPasando], (member([IDVecino,CostoVecinoSolo],Conexiones), CostoVecinoPasando is CostoVecinoSolo + CostoNodo), Vecinos).
 
-% agregar(FronteraSinNodo,Vecinos,NuevaFrontera,NuevosVisitados,Nodo,Metas):-
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% agregar(+FronteraSinNodo,+Vecinos,-NuevaFrontera,+NuevosVisitados,+Nodo,+Metas)
+%
+% Dado una Frontera y un Nodo, este no pertenece a la frontera, los vecinos de 
+% dicho nodo , metas a buscar y los nodos que ya se visitaron se agregan los nodos
+% vecinos a la frontera, agregandolos a la relacion padre/2 y ordenandolos por costo
 
 agregar(FronteraSinNodo, Vecinos, NuevaFrontera, NuevosVisitados, Nodo, Metas):-
 	quitarNodosRepetidos(Vecinos,NuevosVisitados,VecinosNoVisitados),
@@ -147,7 +152,7 @@ agregar(FronteraSinNodo, Vecinos, NuevaFrontera, NuevosVisitados, Nodo, Metas):-
 	calcularCosto(VecinosNoFrontera,MetaMasCercana,VecinosNoFronteraConCosto),
 	insertarListaOrdenada(VecinosNoFronteraConCosto,FronteraSinNodo,NuevaFrontera).
 
-%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 % quitarNodosRepetidos(+NodosOrigen, +NodosNoRepetir, -NodosSinRepetir)
 %
 % Similar a como funciona el operador - en conjuntos, permanecen 
@@ -174,6 +179,7 @@ agregarAVisitados(Nodo, Visitados, [Nodo | Visitados]).
 % dada la funcion f(n) = coste(n) + heuristica(n).
 
 calcularCosto(Nodos, Meta, NodosConCosto):- findall([Id,Costo],(member([Id,CostoActual],Nodos), calcularH(Id,Meta,CostoHeuristica), Costo is CostoActual + CostoHeuristica),NodosConCosto).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % costoCamino(+Lista, ?Costo)

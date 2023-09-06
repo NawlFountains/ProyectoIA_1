@@ -34,26 +34,37 @@
 
 
 update_beliefs([]).
-update_beliefs(Perc):- forall(member(Rel,Perc),update(Rel)). 
+update_beliefs(Perc):- findall(at(_,_,_),member(at(_IdNodo,_TipoEntidad,_IdEntidad),Perc),AtList),
+					forall(member(Rel,Perc),
+					update(Rel,AtList)). 
 		       	     
 
-update(T):- T = time(_), 
+update(T,_):- T = time(_), 
 	    retractall(time(_)),
 	    assert(T).
 
-update(D):- D = direction(_), 
+update(D,_):- D = direction(_), 
 	    retractall(direction(_)),
 	    assert(D).
 
-update(A):- A = at(IdNodo,TipoEntidad,IdEntidad), 
+update(A,_):- A = at(IdNodo,TipoEntidad,_), 
 	    TipoEntidad \= agente,
+		retractall(at(IdNodo,_,_)),
 	    assert(A).
-update(A):- A = at(IdNodo,agente,IdEntidad),
+
+update(A,_):- A = at(_,agente,_),
 	    retractall(at(_,agente,_)),
 	    assert(A).
 
-update(N):- N = node(Id, PosX, PosY, Costo, Conexiones), 
-	    retractall(at(Id,_,_)), 
+update(N,AtList):- N = node(Id, PosX, PosY, Costo, Conexiones),
+		member(at(Id,_,_),AtList),!,
 	    retractall(node(Id,_,_,_,_)), 
 	    assert(node(Id, PosX, PosY, Costo, Conexiones)).
+
+update(N,_):- N = node(Id, PosX, PosY, Costo, Conexiones),
+		retractall(at(Id,_,_)),
+	    retractall(node(Id,_,_,_,_)), 
+	    assert(node(Id, PosX, PosY, Costo, Conexiones)).
+
+
 

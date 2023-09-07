@@ -97,12 +97,12 @@ decide_action(Action, 'Avanzar...'):-
 % Si no tengo un plan guardado, busco uno nuevo.
 
 decide_action(Action, 'Avanzar con nuevo plan ...'):-
- 	busqueda_plan(Plan, _Destino, _Costo),
+ 	busqueda_plan(Plan, Destino, _Costo),
 	Plan \= [],
 	obtenerMovimiento(Plan, Action, Resto),
 	!,
 	retractall(meta_en(_)),
-	assert(meta_en(_Destino)),
+	assert(meta_en(Destino)),
 	assert(plandesplazamiento(Resto)).
 
 % Giro en sentido horario, para conocer mas terreno.

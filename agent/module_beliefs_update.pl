@@ -34,7 +34,7 @@
 
 
 update_beliefs([]).
-update_beliefs(Perc):- findall(at(_IdNodo,_TipoEntidad,_IdEntidad),member(at(_IdNodo,_TipoEntidad,_IdEntidad),Perc),AtList),
+update_beliefs(Perc):- findall(at(IdNodo,TipoEntidad,IdEntidad),member(at(IdNodo,TipoEntidad,IdEntidad),Perc),AtList),
 					forall(member(Rel,Perc),
 					update(Rel,AtList)). 
 		       	     

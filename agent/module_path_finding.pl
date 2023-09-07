@@ -146,7 +146,7 @@ agregar(FronteraSinNodo, Vecinos, NuevaFrontera, NuevosVisitados, Nodo, Metas):-
 	quitarNodosRepetidos(Vecinos,NuevosVisitados,VecinosNoVisitados),
 	quitarNodosRepetidos(VecinosNoVisitados,FronteraSinNodo,VecinosNoFrontera),
 	% Necesitamos establecer relacion padre e hijo
-	Nodo = [P,CostoNodo],
+	Nodo = [P,_],
 	forall(member([N,_],VecinosNoFrontera), assert(padre(N,P))),
 	obtenerMasCercano(P,Metas,MetaMasCercana),
 	calcularCosto(VecinosNoFrontera,MetaMasCercana,VecinosNoFronteraConCosto),
@@ -218,7 +218,7 @@ distance([X1, Y1], [X2, Y2], Distance):-
 %
 %Obtiene la meta mas cercana de una lista de metas dado un nodo.
 %
-obtenerMasCercano(Node,[Meta],Meta) :- !.
+obtenerMasCercano(_,[Meta],Meta) :- !.
 obtenerMasCercano(Node,[Meta|ListaMetas],MetaMasCercana):- 
 	obtenerMasCercano(Node,ListaMetas,MetaMasCercanaAux),
 	masCerca(Node,Meta,MetaMasCercanaAux,MetaMasCercana).
@@ -230,7 +230,7 @@ obtenerMasCercano(Node,[Meta|ListaMetas],MetaMasCercana):-
 %Dada dos Metas define cual es la mas cercana a Node segun la distancia euclidia.
 
 masCerca(Node,MetaA,MetaB,MetaA):- calcularH(Node,MetaA,HA),calcularH(Node,MetaB,HB),HA=<HB, !.
-masCerca(Node,MetaA,MetaB,MetaB).
+masCerca(_,_,MetaB,MetaB).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %

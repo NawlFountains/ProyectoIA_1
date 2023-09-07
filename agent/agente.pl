@@ -52,18 +52,6 @@
 run(Perc, Action, Text, Beliefs):-
 	update_beliefs(Perc), % implementado en module_beliefs_update
 	decide_action(Action, Text),
-	
-	at(CN, agente, me), 
-       	write('Agente en '),
-	write(CN),
-	node(CN,_,_,_,Con),
-	write('\nNodos adyacentes al del agente\n'),
-	forall(member(X,Con),write(X)),
-	write('\n'),
-	write('Accion '),
-	write(Action),
-	write(Text),
-	write('\n'),
 	findall(at(X, Y, Z), at(X, Y, Z), Beliefs).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -109,7 +97,6 @@ decide_action(Action, 'Avanzar...'):-
 % Si no tengo un plan guardado, busco uno nuevo.
 
 decide_action(Action, 'Avanzar con nuevo plan ...'):-
-	write('Por buscar plan'),
  	busqueda_plan(Plan, _Destino, _Costo),
 	Plan \= [],
 	obtenerMovimiento(Plan, Action, Resto),

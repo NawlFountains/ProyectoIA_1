@@ -39,6 +39,10 @@ update_beliefs(Perc):- findall(at(_IdNodo,_TipoEntidad,_IdEntidad),member(at(_Id
 					update(Rel,AtList)). 
 		       	     
 
+% update(+Perc,+Atlist).
+%
+% update recibe una percepcion y una lista de objetos y dependiendo de que es la percepcion realiza distintas acciones
+% update(N,AtList) y update(N,_) son los casos mas interesantes ya que son los que se encargan de revisar las creencias de los objetos que ve o deja de ver el agente
 update(T,_):- T = time(_), 
 	    retractall(time(_)),
 	    assert(T).
